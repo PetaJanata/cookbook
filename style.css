@@ -17,7 +17,10 @@ body {
 /* Grid layout */
 .recipes-grid {
   display: grid;
-  gap: 20px;
+  gap: 40px;
+  position:relative;
+  width:75%;
+  left:12.5%;
 }
 
 /* Default: 1–2 per row on small screens */
