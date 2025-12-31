@@ -1,1 +1,87 @@
+* {
+  box-sizing: border-box;
+}
 
+body {
+  margin: 0;
+  padding: 20px;
+  background: #fafafa;
+}
+
+/* Page Title */
+.title {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Grid layout */
+.recipes-grid {
+  display: grid;
+  gap: 20px;
+}
+
+/* Default: 1–2 per row on small screens */
+@media (min-width: 768px) {
+  .recipes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* HD screens: exactly 3 per row */
+@media (min-width: 1200px) {
+  .recipes-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Recipe Card */
+.recipe-card {
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 14px rgba(0,0,0,0.08);
+  transition: transform .15s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Image */
+.recipe-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Card Body */
+.recipe-info {
+  padding: 14px 16px 18px;
+}
+
+/* Name */
+.recipe-name {
+  font-size: 1.15rem;
+  margin: 6px 0 10px;
+}
+
+/* Label pill */
+.recipe-label {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #ffefe2;
+  color: #b35400;
+  font-size: 0.8rem;
+  margin-right: 10px;
+}
+
+/* Time with icon */
+.recipe-time::before {
+  content: "⏱ ";
+}
+
+.recipe-time {
+  font-size: 0.85rem;
+  color: #444;
+}
