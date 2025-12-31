@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon (optional) -->
+    <link rel="icon" href="favicon.ico" />
+  
+  <!-- Google Font: Winky Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Playwrite+US+Modern+Guides&family=Playwrite+US+Modern:wght@100..400&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <title>Bachata</title>
+
+  
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Landing Section -->
+  <section class="hero">
+    <h1 class="text-6xl md:text-8xl font-light tracking-wider text-white drop-shadow-lg">My Bachata journey</h1>
+   </section>
+
+
+  <div class="hero-buttons">
+    <button id="btn-renča" class="filter-btn">Peťák a Renča</button>
+    <button id="btn-peta" class="filter-btn">Peťa a Peťa</button>
+    <button id="btn-all" class="filter-btn">Video galerie</button>
+  </div>
+
+   
+  <!-- Video Section Block -->
+  <section class="video-block" id="video-gallery">
+    <!-- Videos will be inserted dynamically by JS -->
+ 
+  </section>
+  <!-- PapaParse CSV parser (must load before your script.js) -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  
+  <script src="script.js"></script>
+</body>
+</html>
