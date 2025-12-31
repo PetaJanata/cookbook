@@ -3,7 +3,7 @@ const sentinel = document.getElementById("sentinel");
 
 let recipes = [];
 let index = 0;
-const batchSize = 6; // 3 cards × 2 rows
+const batchSize = 6; // 3 × 2 rows
 
 // ---- Load CSV ----
 fetch("recipes.csv")
@@ -14,23 +14,30 @@ fetch("recipes.csv")
   })
   .catch(err => console.error("CSV Load Error:", err));
 
-// ---- Parse CSV safely ----
+
+// ---- Parse CSV using HEADER NAMES ----
 function parseCSV(text) {
-  return text
-    .trim()
-    .split("\n")
-    .slice(1)
-    .map(line => {
-      const parts = line.replace(/\r/g, "").split(",");
-      return {
-        name: parts[0],
-        image: parts[1],
-        label: parts[2],
-        time: parts[3]
-      };
-    })
-    .filter(r => r.name); // skip blanks
+  const lines = text.trim().split("\n");
+
+  // Read the header row & split
+  const headers = lines[0].replace(/\r/g, "").split(",");
+
+  // Build a lookup: { HeaderName : index }
+  const col = {};
+  headers.forEach((h, i) => col[h.trim()] = i);
+
+  return lines.slice(1).map(line => {
+    const parts = line.replace(/\r/g, "").split(",");
+
+    return {
+      name: parts[col["Name"]],
+      image: parts[col["MainPicture"]],
+      label: parts[col["Label"]],
+      time: parts[col["Time"]]
+    };
+  }).filter(r => r.name);
 }
+
 
 // ---- Render ----
 function loadMore() {
@@ -53,9 +60,9 @@ function addRecipeCard(r) {
       <span class="recipe-time">${r.time}</span>
     </div>
   `;
-
   grid.appendChild(card);
 }
+
 
 // ---- Infinite Scroll ----
 const observer = new IntersectionObserver(entries => {
