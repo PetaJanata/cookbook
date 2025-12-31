@@ -1,10 +1,10 @@
 Recipe,Name,MainPicture,Label,Time
-1,AAA,images/test1,BREAKFAST,60 min
-2,BBB,images/test1,DRINKS,45 min
-3,CCC,images/test1,MAIN DISH,1 day + 30 min
-4,DDD,images/test1,SNACKS & SIDES,4 min
-5,EEE,images/test1,BAKING & DESSERTS,5 min
-6,FFF,images/test1,BREAKFAST,60 min
-7,GGG,images/test1,DRINKS,45 min
-8,HHH,images/test1,MAIN DISH,1 day + 30 min
-9,III,images/test1,SNACKS & SIDES,4 min
+1,AAA,images/test1.jpg,BREAKFAST,60 min
+2,BBB,images/test1.jpg,DRINKS,45 min
+3,CCC,images/test1.jpg,MAIN DISH,1 day + 30 min
+4,DDD,images/test1.jpg,SNACKS & SIDES,4 min
+5,EEE,images/test1.jpg,BAKING & DESSERTS,5 min
+6,FFF,images/test1.jpg,BREAKFAST,60 min
+7,GGG,images/test1.jpg,DRINKS,45 min
+8,HHH,images/test1.jpg,MAIN DISH,1 day + 30 min
+9,III,images/test1.jpg,SNACKS & SIDES,4 min
