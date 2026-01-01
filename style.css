@@ -66,6 +66,13 @@ body {
   font-family: Poppins, sans-serif;
 }
 
+/* container for label + time */
+.recipe-meta {
+  display: flex;
+  flex-wrap: wrap;          /* allow moving to new line */
+  align-items: center;
+}
+
 /* Label pill */
 .recipe-label {
   display: inline-block;
@@ -118,4 +125,6 @@ body {
   font-size: 0.85rem;
   color: #444;
   font-family: Poppins, sans-serif;
+  margin-left:auto; /* push to right when sharing row */
+  white-space:nowrap; /* keep ⏱ and text together */
 }
