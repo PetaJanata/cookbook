@@ -39,6 +39,31 @@ function parseCSV(text) {
 }
 
 
+const labelClassMap = {
+  "Breakfast": "label-breakfast",
+  "Main Dish": "label-main",
+  "Baking & desserts": "label-baking",
+  "Snacks & Sides": "label-snacks",
+  "Drinks": "label-drinks"
+};
+
+let uniqueLabels = new Set();
+
+recipes.forEach(r => uniqueLabels.add(r.label));
+
+const labelBar = document.getElementById("label-bar");
+
+uniqueLabels.forEach(label => {
+  const span = document.createElement("span");
+
+  span.className = `category-label ${labelClassMap[label] || ""}`;
+  span.textContent = label;
+
+  labelBar.appendChild(span);
+});
+
+
+
 // ---- Label → class mapping ----
 function labelClass(label) {
   if (!label) return "";
