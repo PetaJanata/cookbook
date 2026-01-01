@@ -41,6 +41,31 @@ body {
   transform: translateY(-1px);
 }
 
+/* ================= LABEL BAR ================= */
+
+.label-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+/* Base label bar style */
+.category-label {
+  padding: 8px 14px;
+  border-radius: 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: border .2s ease;
+}
+
+/* Hover → add border same as text */
+.category-label:hover {
+  border: 2px solid currentColor;
+}
+
+
 
 
 /* Grid layout */
@@ -100,6 +125,7 @@ body {
   display: flex;
   flex-wrap: wrap;          /* allow moving to new line */
   align-items: center;
+  justify-content:space-between;
 }
 
 /* Label pill */
@@ -114,11 +140,16 @@ body {
   font-family: Inter, sans-serif;
 }
 
+/* ========== COLOR CLASSES (SHARED) ========== */
+
+
 /* Breakfast */
 .label-breakfast {
   background:#efedfa;
   color:#3c3a8f;
 }
+
+
 
 /* Main Dish */
 .label-main-dish {
