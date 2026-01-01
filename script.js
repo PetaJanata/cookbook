@@ -171,3 +171,53 @@ function observeLastCard() {
 
   observer.observe(last);
 }
+
+
+// URL //
+const cards = document.querySelectorAll(".recipe-card");
+const labels = document.querySelectorAll(".category-label");
+
+function filterRecipes(category) {
+
+  cards.forEach(card => {
+    const cardCat = card.dataset.category;
+    card.style.display =
+      (!category || cardCat === category) ? "" : "none";
+  });
+
+  // highlight selected label
+  labels.forEach(label =>
+    label.classList.toggle("active", label.dataset.filter === category)
+  );
+}
+
+function setCategoryUrl(category) {
+  const base = "/cookbook";
+
+  if (!category) {
+    history.pushState({}, "", `${base}/`);
+  } else {
+    history.pushState({}, "", `${base}/categories/${category}`);
+  }
+}
+
+// when user clicks label
+labels.forEach(label => {
+  label.addEventListener("click", () => {
+    const category = label.dataset.filter;
+    setCategoryUrl(category);
+    filterRecipes(category);
+  });
+});
+
+// read category from URL when page loads
+function initFromUrl() {
+  const path = window.location.pathname.toLowerCase();
+
+  const match = path.match(/\/categories\/([^/]+)/);
+  const category = match ? match[1] : null;
+
+  filterRecipes(category);
+}
+
+initFromUrl();
