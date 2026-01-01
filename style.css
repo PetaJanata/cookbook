@@ -63,6 +63,7 @@ body {
 .recipe-name {
   font-size: 2rem;
   margin: 6px 0 10px;
+  font-family: Poppins, sans-serif;
 }
 
 /* Label pill */
@@ -74,6 +75,7 @@ body {
   color: #b35400;
   font-size: 1rem;
   margin-right: 10px;
+  font-family: Inter, sans-serif;
 }
 
 /* Breakfast */
@@ -115,4 +117,5 @@ body {
 .recipe-time {
   font-size: 0.85rem;
   color: #444;
+  font-family: Poppins, sans-serif;
 }
