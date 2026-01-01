@@ -1,9 +1,10 @@
 const grid = document.getElementById("recipesGrid");
-const sentinel = document.getElementById("sentinel");
 
 let recipes = [];
 let index = 0;
 const batchSize = 6; // 3 × 2 rows
+
+let observer = null;
 
 
 // ---- Load CSV ----
@@ -35,25 +36,27 @@ function parseCSV(text) {
         time: parts[col["Time"]]
       };
     })
-    .filter(r => r && r.name); // skip blanks
+    .filter(r => r && r.name);
 }
 
 
-// ---- Render a batch ----
+// ---- Load a batch ----
 function loadMore() {
 
-  // nothing left? stop observing
   if (index >= recipes.length) {
-    observer.unobserve(sentinel);
+    if (observer) observer.disconnect();
     return;
   }
 
   const slice = recipes.slice(index, index + batchSize);
   slice.forEach(addRecipeCard);
   index += batchSize;
+
+  observeLastCard();
 }
 
 
+// ---- Create Card ----
 function addRecipeCard(r) {
   const card = document.createElement("div");
   card.className = "recipe-card";
@@ -71,17 +74,22 @@ function addRecipeCard(r) {
 }
 
 
-// ---- Infinite Scroll (reliable) ----
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
+// ---- Observe the LAST card ----
+function observeLastCard() {
+
+  if (observer) observer.disconnect(); // stop watching the old one
+
+  const cards = document.querySelectorAll(".recipe-card");
+  const last = cards[cards.length - 1];
+  if (!last) return;
+
+  observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
       loadMore();
     }
+  }, {
+    rootMargin: "200px"
   });
-}, {
-  root: null,
-  rootMargin: "200px",   // load a bit early
-  threshold: 0
-});
 
-observer.observe(sentinel);
+  observer.observe(last);
+}
