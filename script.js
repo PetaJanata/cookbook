@@ -72,23 +72,23 @@ function buildLabelBar() {
 
 // ---- Handle filter click ----
 function clickFilter(labelText, slug) {
-  if (activeFilter === slug) {
-    activeFilter = null;
-    filteredRecipes = allRecipes;
-    history.pushState({}, "", "/cookbook/");
-  } else {
-    activeFilter = slug;
-    filteredRecipes = allRecipes.filter(r => r.label === labelText);
-    history.pushState({}, "", `/cookbook/categories/${slug}`);
-  }
+  // Always filter by the clicked label
+  activeFilter = slug;
+  filteredRecipes = allRecipes.filter(r => r.label === labelText);
 
+  // Update URL
+  history.pushState({}, "", `/cookbook/categories/${slug}`);
+
+  // Highlight the clicked label
   clearActiveStates();
   document
     .querySelectorAll(`[data-slug="${slug}"]`)
     .forEach(el => el.classList.add("active"));
 
+  // Reload the grid with filtered recipes
   resetAndLoad();
 }
+
 
 function clearActiveStates() {
   document.querySelectorAll(".category-label").forEach(el => el.classList.remove("active"));
