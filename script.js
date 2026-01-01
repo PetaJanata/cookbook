@@ -8,35 +8,38 @@ const batchSize = 6;
 let observer = null;
 let activeFilter = null;
 
-// Load CSV
+// ---- Load CSV ----
 fetch("recipes.csv")
   .then(res => res.text())
   .then(text => {
     allRecipes = parseCSV(text);
-    filteredRecipes = allRecipes;
     buildLabelBar();
-    initFromUrl();
-  });
+    initFromUrl(); // <-- only on initial load
+  })
+  .catch(err => console.error("CSV Load Error:", err));
 
-// Parse CSV
+// ---- Parse CSV with trimming ----
 function parseCSV(text) {
   const lines = text.trim().split("\n");
   const headers = lines[0].replace(/\r/g, "").split(",");
+
   const col = {};
   headers.forEach((h, i) => col[h.trim()] = i);
 
-  return lines.slice(1).map(line => {
-    const parts = line.replace(/\r/g, "").split(",");
-    return {
-      name: parts[col["Name"]],
-      image: parts[col["MainPicture"]],
-      label: parts[col["Label"]],
-      time: parts[col["Time"]]
-    };
-  }).filter(r => r && r.name);
+  return lines.slice(1)
+    .map(line => {
+      const parts = line.replace(/\r/g, "").split(",");
+      return {
+        name: parts[col["Name"]].trim(),
+        image: parts[col["MainPicture"]].trim(),
+        label: parts[col["Label"]].trim(),
+        time: parts[col["Time"]].trim()
+      };
+    })
+    .filter(r => r && r.name && r.image);
 }
 
-// Label → class
+// ---- Map label to class for colors ----
 function labelClass(label) {
   if (!label) return "";
   const key = label.trim().toLowerCase();
@@ -48,23 +51,26 @@ function labelClass(label) {
   return "";
 }
 
-// Build label bar
+// ---- Build label bar ----
 function buildLabelBar() {
   const unique = [...new Set(allRecipes.map(r => r.label))];
   labelBar.innerHTML = "";
+
   unique.forEach(label => {
     const span = document.createElement("span");
     span.className = `category-label ${labelClass(label)}`;
     span.textContent = label;
     span.dataset.slug = label.toLowerCase().replace(/\s+/g, "-");
+
     span.addEventListener("click", () =>
       clickFilter(label, span.dataset.slug)
     );
+
     labelBar.appendChild(span);
   });
 }
 
-// Handle click
+// ---- Handle filter click ----
 function clickFilter(labelText, slug) {
   if (activeFilter === slug) {
     activeFilter = null;
@@ -81,14 +87,14 @@ function clickFilter(labelText, slug) {
     .querySelectorAll(`[data-slug="${slug}"]`)
     .forEach(el => el.classList.add("active"));
 
-  resetAndLoad(); // <-- always rebuild grid from filteredRecipes
+  resetAndLoad();
 }
 
 function clearActiveStates() {
   document.querySelectorAll(".category-label").forEach(el => el.classList.remove("active"));
 }
 
-// Reset grid + scroll
+// ---- Reset grid + scroll ----
 function resetAndLoad() {
   if (observer) observer.disconnect();
   grid.innerHTML = "";
@@ -96,7 +102,7 @@ function resetAndLoad() {
   loadMore();
 }
 
-// Load recipes with infinite scroll
+// ---- Load recipes dynamically ----
 async function loadMore() {
   if (index >= filteredRecipes.length) return;
 
@@ -110,7 +116,7 @@ async function loadMore() {
   observeLastCard();
 }
 
-// Create a recipe card
+// ---- Create recipe card ----
 function addRecipeCard(r) {
   const card = document.createElement("div");
   card.className = "recipe-card";
@@ -130,7 +136,7 @@ function addRecipeCard(r) {
   grid.appendChild(card);
 }
 
-// Infinite scroll
+// ---- Infinite scroll ----
 function observeLastCard() {
   if (observer) observer.disconnect();
   const cards = document.querySelectorAll(".recipe-card");
@@ -144,7 +150,7 @@ function observeLastCard() {
   observer.observe(last);
 }
 
-// Initialize from URL
+// ---- Init from URL ----
 function initFromUrl() {
   const path = window.location.pathname.toLowerCase();
   const match = path.match(/\/categories\/([^/]+)/);
