@@ -76,6 +76,47 @@ body {
   margin-right: 10px;
 }
 
+
+/* Default pill */
+.recipe-label {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin-right: 10px;
+}
+
+/* Breakfast */
+.label-breakfast {
+  background:#efedfa;
+  color:#3c3a8f;
+}
+
+/* Main Dish */
+.label-main-dish {
+  background:#f0f5c4;
+  color:#59871f;
+}
+
+/* Baking & Desserts */
+.label-baking-desserts {
+  background:#e8f5fa;
+  color:#397a9e;
+}
+
+/* Snacks & Sides */
+.label-snacks-sides {
+  background:#feefc9;
+  color:#3d1640;
+}
+
+/* Drinks */
+.label-drinks {
+  background:#ffeae3;
+  color:#f0493e;
+}
+
+
 /* Time with icon */
 .recipe-time::before {
   content: "⏱ ";
