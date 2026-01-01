@@ -1,8 +1,9 @@
 const grid = document.getElementById("recipesGrid");
+const labelBar = document.getElementById("label-bar");
 
 let recipes = [];
 let index = 0;
-const batchSize = 6;  // 3 × 2 rows
+const batchSize = 6;
 let observer = null;
 
 
@@ -11,16 +12,18 @@ fetch("recipes.csv")
   .then(res => res.text())
   .then(text => {
     recipes = parseCSV(text);
-    loadMore();
+
+    buildLabelBar();   // Create label bar
+    loadMore();        // Load first recipes
   })
   .catch(err => console.error("CSV Load Error:", err));
 
 
-// ---- Parse CSV using HEADER NAMES ----
+// ---- Parse CSV using header names ----
 function parseCSV(text) {
   const lines = text.trim().split("\n");
-
   const headers = lines[0].replace(/\r/g, "").split(",");
+
   const col = {};
   headers.forEach((h, i) => col[h.trim()] = i);
 
@@ -39,48 +42,42 @@ function parseCSV(text) {
 }
 
 
-const labelClassMap = {
-  "Breakfast": "label-breakfast",
-  "Main Dish": "label-main",
-  "Baking & desserts": "label-baking",
-  "Snacks & Sides": "label-snacks",
-  "Drinks": "label-drinks"
-};
-
-let uniqueLabels = new Set();
-
-recipes.forEach(r => uniqueLabels.add(r.label));
-
-const labelBar = document.getElementById("label-bar");
-
-uniqueLabels.forEach(label => {
-  const span = document.createElement("span");
-
-  span.className = `category-label ${labelClassMap[label] || ""}`;
-  span.textContent = label;
-
-  labelBar.appendChild(span);
-});
-
-
-
-// ---- Label → class mapping ----
+// ---- Shared color class logic ----
 function labelClass(label) {
   if (!label) return "";
-
   const key = label.trim().toLowerCase();
 
   if (key.includes("breakfast")) return "label-breakfast";
-  if (key.includes("main")) return "label-main-dish";
-  if (key.includes("baking") || key.includes("dessert")) return "label-baking-desserts";
-  if (key.includes("snack") || key.includes("side")) return "label-snacks-sides";
+  if (key.includes("main")) return "label-main";
+  if (key.includes("baking") || key.includes("dessert")) return "label-baking";
+  if (key.includes("snack") || key.includes("side")) return "label-snacks";
   if (key.includes("drink")) return "label-drinks";
 
-  return ""; // fallback style
+  return "";
 }
 
 
-// ---- Load a batch (with tiny stagger → smooth UI) ----
+// ---- Build Label Bar ----
+function buildLabelBar() {
+
+  const unique = new Set();
+
+  recipes.forEach(r => {
+    if (r.label) unique.add(r.label.trim());
+  });
+
+  unique.forEach(label => {
+    const span = document.createElement("span");
+
+    span.className = `category-label ${labelClass(label)}`;
+    span.textContent = label;
+
+    labelBar.appendChild(span);
+  });
+}
+
+
+// ---- Load recipes smoothly ----
 async function loadMore() {
   if (index >= recipes.length) {
     if (observer) observer.disconnect();
@@ -91,7 +88,7 @@ async function loadMore() {
 
   for (const r of slice) {
     addRecipeCard(r);
-    await new Promise(r => setTimeout(r, 40)); // small delay for smoother paint
+    await new Promise(r => setTimeout(r, 40));
   }
 
   index += batchSize;
@@ -104,27 +101,24 @@ function addRecipeCard(r) {
   const card = document.createElement("div");
   card.className = "recipe-card";
 
-  const labelCls = labelClass(r.label);
-
   card.innerHTML = `
-  <img src="${r.image}" alt="${r.name}" loading="lazy">
+    <img src="${r.image}" alt="${r.name}" loading="lazy">
 
-  <div class="recipe-info">
-    <div class="recipe-name">${r.name}</div>
+    <div class="recipe-info">
+      <div class="recipe-name">${r.name}</div>
 
-    <div class="recipe-meta">
-      <span class="recipe-label ${labelCls}">${r.label}</span>
-      <span class="recipe-time">${r.time}</span>
+      <div class="recipe-meta">
+        <span class="recipe-label ${labelClass(r.label)}">${r.label}</span>
+        <span class="recipe-time">${r.time}</span>
+      </div>
     </div>
-  </div>
-`;
-
+  `;
 
   grid.appendChild(card);
 }
 
 
-// ---- Observe LAST CARD for infinite scroll ----
+// ---- Infinite scroll watching last card ----
 function observeLastCard() {
   if (observer) observer.disconnect();
 
