@@ -72,33 +72,41 @@ function buildLabelBar() {
 
     span.className = `category-label ${labelClass(label)}`;
     span.textContent = label;
+    span.dataset.filter = label.toLowerCase().replace(/\s+/g, "-");
 
-    span.addEventListener("click", () => toggleFilter(label, span));
+    span.addEventListener("click", () =>
+      clickFilter(label, span.dataset.filter)
+    );
 
     labelBar.appendChild(span);
   });
 }
 
 
-// ---- Handle filter click ----
-function toggleFilter(label, el) {
 
-  // clicking same label clears filter
-  if (activeFilter === label) {
+// ---- Handle filter click ----
+function clickFilter(labelText, slug) {
+
+  // store active filter
+  if (activeFilter === slug) {
     activeFilter = null;
     filteredRecipes = allRecipes;
-    clearActiveStates();
+    history.pushState({}, "", "/cookbook/");
+  } else {
+    activeFilter = slug;
+    filteredRecipes = allRecipes.filter(r => r.label === labelText);
+    history.pushState({}, "", `/cookbook/categories/${slug}`);
   }
-  else {
-    activeFilter = label;
-    filteredRecipes = allRecipes.filter(r => r.label === label);
 
-    clearActiveStates();
-    el.classList.add("active");
-  }
+  // highlight
+  clearActiveStates();
+  document
+    .querySelectorAll(`[data-filter="${slug}"]`)
+    .forEach(el => el.classList.add("active"));
 
   resetAndLoad();
 }
+
 
 
 function clearActiveStates() {
@@ -212,12 +220,35 @@ labels.forEach(label => {
 
 // read category from URL when page loads
 function initFromUrl() {
+
   const path = window.location.pathname.toLowerCase();
-
   const match = path.match(/\/categories\/([^/]+)/);
-  const category = match ? match[1] : null;
+  const slug = match ? match[1] : null;
 
-  filterRecipes(category);
+  if (!slug) {
+    filteredRecipes = allRecipes;
+    resetAndLoad();
+    return;
+  }
+
+  // find real label text from slug
+  const recipe = allRecipes.find(r =>
+    r.label &&
+    r.label.toLowerCase().replace(/\s+/g, "-") === slug
+  );
+
+  if (!recipe) return;
+
+  activeFilter = slug;
+  filteredRecipes = allRecipes.filter(r => r.label === recipe.label);
+
+  clearActiveStates();
+  document
+    .querySelectorAll(`[data-filter="${slug}"]`)
+    .forEach(el => el.classList.add("active"));
+
+  resetAndLoad();
 }
 
 initFromUrl();
+
