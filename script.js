@@ -82,15 +82,18 @@ function addRecipeCard(r) {
   const labelCls = labelClass(r.label);
 
   card.innerHTML = `
-    <img src="${r.image}"
-         alt="${r.name}"
-         loading="lazy">
-    <div class="recipe-info">
-      <div class="recipe-name">${r.name}</div>
+  <img src="${r.image}" alt="${r.name}" loading="lazy">
+
+  <div class="recipe-info">
+    <div class="recipe-name">${r.name}</div>
+
+    <div class="recipe-meta">
       <span class="recipe-label ${labelCls}">${r.label}</span>
       <span class="recipe-time">${r.time}</span>
     </div>
-  `;
+  </div>
+`;
+
 
   grid.appendChild(card);
 }
