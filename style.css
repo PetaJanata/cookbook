@@ -61,28 +61,18 @@ body {
 
 /* Name */
 .recipe-name {
-  font-size: 1.15rem;
+  font-size: 2rem;
   margin: 6px 0 10px;
 }
 
 /* Label pill */
 .recipe-label {
   display: inline-block;
-  padding: 4px 10px;
+  padding: 10px 20px;
   border-radius: 20px;
   background: #ffefe2;
   color: #b35400;
-  font-size: 0.8rem;
-  margin-right: 10px;
-}
-
-
-/* Default pill */
-.recipe-label {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 1rem;
   margin-right: 10px;
 }
 
