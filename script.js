@@ -122,8 +122,11 @@ function addRecipeCard(r) {
   card.className = "recipe-card";
   card.dataset.category = r.label.toLowerCase().replace(/\s+/g, "-");
 
+  // Ensure image path is always absolute relative to /cookbook/
+  const imgSrc = r.image.startsWith("http") ? r.image : `/cookbook/${r.image}`;
+
   card.innerHTML = `
-    <img src="${r.image}" alt="${r.name}" loading="lazy">
+    <img src="${imgSrc}" alt="${r.name}" loading="lazy">
     <div class="recipe-info">
       <div class="recipe-name">${r.name}</div>
       <div class="recipe-meta">
@@ -135,6 +138,7 @@ function addRecipeCard(r) {
 
   grid.appendChild(card);
 }
+
 
 // ---- Infinite scroll ----
 function observeLastCard() {
