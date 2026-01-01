@@ -149,22 +149,20 @@ body {
   color:#3c3a8f;
 }
 
-
-
 /* Main Dish */
-.label-main-dish {
+.label-main {
   background:#f0f5c4;
   color:#59871f;
 }
 
 /* Baking & Desserts */
-.label-baking-desserts {
+.label-baking {
   background:#e8f5fa;
   color:#397a9e;
 }
 
 /* Snacks & Sides */
-.label-snacks-sides {
+.label-snacks {
   background:#feefc9;
   color:#3d1640;
 }
