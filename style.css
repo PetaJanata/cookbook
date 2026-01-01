@@ -14,6 +14,35 @@ body {
   margin-bottom: 30px;
 }
 
+/* LABEL BAR SECTION */
+#label-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px auto 30px;
+  max-width: 1200px;
+}
+
+/* larger category labels */
+.category-label {
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-block;
+  border: 2px solid transparent;
+  transition: border-color .2s ease, transform .15s ease;
+}
+
+/* hover → border color matches text color */
+.category-label:hover {
+  cursor: pointer;
+  border-color: currentColor;
+  transform: translateY(-1px);
+}
+
+
+
 /* Grid layout */
 .recipes-grid {
   display: grid;
