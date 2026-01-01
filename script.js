@@ -8,7 +8,6 @@ const batchSize = 6;
 let observer = null;
 let activeFilter = null;
 
-
 // ---- Load CSV ----
 fetch("recipes.csv")
   .then(res => res.text())
@@ -17,10 +16,9 @@ fetch("recipes.csv")
     filteredRecipes = allRecipes;
 
     buildLabelBar();
-    resetAndLoad();
+    initFromUrl(); // <-- apply URL filter if any
   })
   .catch(err => console.error("CSV Load Error:", err));
-
 
 // ---- Parse CSV ----
 function parseCSV(text) {
@@ -43,25 +41,20 @@ function parseCSV(text) {
     .filter(r => r && r.name);
 }
 
-
 // ---- Label → class names ----
 function labelClass(label) {
   if (!label) return "";
   const key = label.trim().toLowerCase();
-
   if (key.includes("breakfast")) return "label-breakfast";
   if (key.includes("main")) return "label-main";
   if (key.includes("baking") || key.includes("dessert")) return "label-baking";
   if (key.includes("snack") || key.includes("side")) return "label-snacks";
   if (key.includes("drink")) return "label-drinks";
-
   return "";
 }
 
-
 // ---- Build Label Bar ----
 function buildLabelBar() {
-
   const unique = new Set();
   allRecipes.forEach(r => r.label && unique.add(r.label.trim()));
 
@@ -69,7 +62,6 @@ function buildLabelBar() {
 
   unique.forEach(label => {
     const span = document.createElement("span");
-
     span.className = `category-label ${labelClass(label)}`;
     span.textContent = label;
     span.dataset.filter = label.toLowerCase().replace(/\s+/g, "-");
@@ -82,12 +74,8 @@ function buildLabelBar() {
   });
 }
 
-
-
-// ---- Handle filter click ----
+// ---- Handle label click ----
 function clickFilter(labelText, slug) {
-
-  // store active filter
   if (activeFilter === slug) {
     activeFilter = null;
     filteredRecipes = allRecipes;
@@ -104,17 +92,14 @@ function clickFilter(labelText, slug) {
     .querySelectorAll(`[data-filter="${slug}"]`)
     .forEach(el => el.classList.add("active"));
 
-  resetAndLoad();
+  resetAndLoad(); // <-- recreate cards dynamically
 }
-
-
 
 function clearActiveStates() {
   document
     .querySelectorAll(".category-label")
     .forEach(l => l.classList.remove("active"));
 }
-
 
 // ---- Reset grid + scroll + index ----
 function resetAndLoad() {
@@ -124,13 +109,11 @@ function resetAndLoad() {
   loadMore();
 }
 
-
-// ---- Load recipes with smooth stagger ----
+// ---- Load recipes dynamically ----
 async function loadMore() {
   if (index >= filteredRecipes.length) return;
 
   const slice = filteredRecipes.slice(index, index + batchSize);
-
   for (const r of slice) {
     addRecipeCard(r);
     await new Promise(r => setTimeout(r, 40));
@@ -140,33 +123,27 @@ async function loadMore() {
   observeLastCard();
 }
 
-
 // ---- Create recipe card ----
 function addRecipeCard(r) {
-
   const card = document.createElement("div");
   card.className = "recipe-card";
+  card.dataset.category = r.label.toLowerCase().replace(/\s+/g, "-"); // <-- needed for future reference
 
   card.innerHTML = `
     <img src="${r.image}" alt="${r.name}" loading="lazy">
-
     <div class="recipe-info">
       <div class="recipe-name">${r.name}</div>
-
       <div class="recipe-meta">
         <span class="recipe-label ${labelClass(r.label)}">${r.label}</span>
         <span class="recipe-time">${r.time}</span>
       </div>
     </div>
   `;
-
   grid.appendChild(card);
 }
 
-
 // ---- Infinite scroll ----
 function observeLastCard() {
-
   if (observer) observer.disconnect();
 
   const cards = document.querySelectorAll(".recipe-card");
@@ -180,46 +157,9 @@ function observeLastCard() {
   observer.observe(last);
 }
 
-
-// URL //
-const cards = document.querySelectorAll(".recipe-card");
-const labels = document.querySelectorAll(".category-label");
-
-function filterRecipes(category) {
-
-  cards.forEach(card => {
-    const cardCat = card.dataset.category;
-    card.style.display =
-      (!category || cardCat === category) ? "" : "none";
-  });
-
-  // highlight selected label
-  labels.forEach(label =>
-    label.classList.toggle("active", label.dataset.filter === category)
-  );
-}
-
-function setCategoryUrl(category) {
-  const base = "/cookbook";
-
-  if (!category) {
-    history.pushState({}, "", `${base}/`);
-  } else {
-    history.pushState({}, "", `${base}/categories/${category}`);
-  }
-}
-
-// when user clicks label
-labels.forEach(label => {
-  label.addEventListener("click", () => {
-    const category = label.dataset.filter;
-    setCategoryUrl(category);
-    filterRecipes(category);
-  });
-});
-
-// read category from URL when page loads
+// ---- Apply filter from URL ----
 function initFromUrl() {
+  buildLabelBar();
 
   const path = window.location.pathname.toLowerCase();
   const match = path.match(/\/categories\/([^/]+)/);
@@ -231,13 +171,16 @@ function initFromUrl() {
     return;
   }
 
-  // find real label text from slug
   const recipe = allRecipes.find(r =>
     r.label &&
     r.label.toLowerCase().replace(/\s+/g, "-") === slug
   );
 
-  if (!recipe) return;
+  if (!recipe) {
+    filteredRecipes = allRecipes;
+    resetAndLoad();
+    return;
+  }
 
   activeFilter = slug;
   filteredRecipes = allRecipes.filter(r => r.label === recipe.label);
@@ -249,6 +192,3 @@ function initFromUrl() {
 
   resetAndLoad();
 }
-
-initFromUrl();
-
