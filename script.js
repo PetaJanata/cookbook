@@ -2,8 +2,7 @@ const grid = document.getElementById("recipesGrid");
 
 let recipes = [];
 let index = 0;
-const batchSize = 6; // 3 × 2 rows
-
+const batchSize = 6;  // 3 × 2 rows
 let observer = null;
 
 
@@ -40,18 +39,37 @@ function parseCSV(text) {
 }
 
 
-// ---- Load a batch ----
-function loadMore() {
+// ---- Label → class mapping ----
+function labelClass(label) {
+  if (!label) return "";
 
+  const key = label.trim().toLowerCase();
+
+  if (key.includes("breakfast")) return "label-breakfast";
+  if (key.includes("main")) return "label-main-dish";
+  if (key.includes("baking") || key.includes("dessert")) return "label-baking-desserts";
+  if (key.includes("snack") || key.includes("side")) return "label-snacks-sides";
+  if (key.includes("drink")) return "label-drinks";
+
+  return ""; // fallback style
+}
+
+
+// ---- Load a batch (with tiny stagger → smooth UI) ----
+async function loadMore() {
   if (index >= recipes.length) {
     if (observer) observer.disconnect();
     return;
   }
 
   const slice = recipes.slice(index, index + batchSize);
-  slice.forEach(addRecipeCard);
-  index += batchSize;
 
+  for (const r of slice) {
+    addRecipeCard(r);
+    await new Promise(r => setTimeout(r, 40)); // small delay for smoother paint
+  }
+
+  index += batchSize;
   observeLastCard();
 }
 
@@ -61,11 +79,15 @@ function addRecipeCard(r) {
   const card = document.createElement("div");
   card.className = "recipe-card";
 
+  const labelCls = labelClass(r.label);
+
   card.innerHTML = `
-    <img src="${r.image}" alt="${r.name}">
+    <img src="${r.image}"
+         alt="${r.name}"
+         loading="lazy">
     <div class="recipe-info">
       <div class="recipe-name">${r.name}</div>
-      <span class="recipe-label">${r.label}</span>
+      <span class="recipe-label ${labelCls}">${r.label}</span>
       <span class="recipe-time">${r.time}</span>
     </div>
   `;
@@ -74,22 +96,17 @@ function addRecipeCard(r) {
 }
 
 
-// ---- Observe the LAST card ----
+// ---- Observe LAST CARD for infinite scroll ----
 function observeLastCard() {
-
-  if (observer) observer.disconnect(); // stop watching the old one
+  if (observer) observer.disconnect();
 
   const cards = document.querySelectorAll(".recipe-card");
   const last = cards[cards.length - 1];
   if (!last) return;
 
   observer = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      loadMore();
-    }
-  }, {
-    rootMargin: "200px"
-  });
+    if (entries[0].isIntersecting) loadMore();
+  }, { rootMargin: "200px" });
 
   observer.observe(last);
 }
