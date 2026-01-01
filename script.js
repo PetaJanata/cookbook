@@ -1,25 +1,28 @@
 const grid = document.getElementById("recipesGrid");
 const labelBar = document.getElementById("label-bar");
 
-let recipes = [];
+let allRecipes = [];
+let filteredRecipes = [];
 let index = 0;
 const batchSize = 6;
 let observer = null;
+let activeFilter = null;
 
 
 // ---- Load CSV ----
 fetch("recipes.csv")
   .then(res => res.text())
   .then(text => {
-    recipes = parseCSV(text);
+    allRecipes = parseCSV(text);
+    filteredRecipes = allRecipes;
 
-    buildLabelBar();   // Create label bar
-    loadMore();        // Load first recipes
+    buildLabelBar();
+    resetAndLoad();
   })
   .catch(err => console.error("CSV Load Error:", err));
 
 
-// ---- Parse CSV using header names ----
+// ---- Parse CSV ----
 function parseCSV(text) {
   const lines = text.trim().split("\n");
   const headers = lines[0].replace(/\r/g, "").split(",");
@@ -30,7 +33,6 @@ function parseCSV(text) {
   return lines.slice(1)
     .map(line => {
       const parts = line.replace(/\r/g, "").split(",");
-
       return {
         name: parts[col["Name"]],
         image: parts[col["MainPicture"]],
@@ -42,7 +44,7 @@ function parseCSV(text) {
 }
 
 
-// ---- Shared color class logic ----
+// ---- Label → class names ----
 function labelClass(label) {
   if (!label) return "";
   const key = label.trim().toLowerCase();
@@ -61,10 +63,9 @@ function labelClass(label) {
 function buildLabelBar() {
 
   const unique = new Set();
+  allRecipes.forEach(r => r.label && unique.add(r.label.trim()));
 
-  recipes.forEach(r => {
-    if (r.label) unique.add(r.label.trim());
-  });
+  labelBar.innerHTML = "";
 
   unique.forEach(label => {
     const span = document.createElement("span");
@@ -72,19 +73,55 @@ function buildLabelBar() {
     span.className = `category-label ${labelClass(label)}`;
     span.textContent = label;
 
+    span.addEventListener("click", () => toggleFilter(label, span));
+
     labelBar.appendChild(span);
   });
 }
 
 
-// ---- Load recipes smoothly ----
-async function loadMore() {
-  if (index >= recipes.length) {
-    if (observer) observer.disconnect();
-    return;
+// ---- Handle filter click ----
+function toggleFilter(label, el) {
+
+  // clicking same label clears filter
+  if (activeFilter === label) {
+    activeFilter = null;
+    filteredRecipes = allRecipes;
+    clearActiveStates();
+  }
+  else {
+    activeFilter = label;
+    filteredRecipes = allRecipes.filter(r => r.label === label);
+
+    clearActiveStates();
+    el.classList.add("active");
   }
 
-  const slice = recipes.slice(index, index + batchSize);
+  resetAndLoad();
+}
+
+
+function clearActiveStates() {
+  document
+    .querySelectorAll(".category-label")
+    .forEach(l => l.classList.remove("active"));
+}
+
+
+// ---- Reset grid + scroll + index ----
+function resetAndLoad() {
+  if (observer) observer.disconnect();
+  grid.innerHTML = "";
+  index = 0;
+  loadMore();
+}
+
+
+// ---- Load recipes with smooth stagger ----
+async function loadMore() {
+  if (index >= filteredRecipes.length) return;
+
+  const slice = filteredRecipes.slice(index, index + batchSize);
 
   for (const r of slice) {
     addRecipeCard(r);
@@ -96,8 +133,9 @@ async function loadMore() {
 }
 
 
-// ---- Create Card ----
+// ---- Create recipe card ----
 function addRecipeCard(r) {
+
   const card = document.createElement("div");
   card.className = "recipe-card";
 
@@ -118,8 +156,9 @@ function addRecipeCard(r) {
 }
 
 
-// ---- Infinite scroll watching last card ----
+// ---- Infinite scroll ----
 function observeLastCard() {
+
   if (observer) observer.disconnect();
 
   const cards = document.querySelectorAll(".recipe-card");
